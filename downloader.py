@@ -4,6 +4,7 @@
 __author__ = 'xuanzhui'
 
 import sys
+import os
 import urllib.request
 import time
 
@@ -34,7 +35,16 @@ class Downloader:
             sys.stdout.write('\n')
 
     def readChunkToFile(self, response, filename, chunkSize=102400, reportHook=False):
-        totalSize = response.getheader('Content-Length').strip()
+        totalSize = response.getheader('Content-Length')
+
+        if not totalSize:
+            if reportHook:
+                print('can NOT determine total size, will download without hint')
+            with open(filename, 'wb') as fw:
+                fw.write(response.read())
+            return True
+
+        totalSize=totalSize.strip()
         totalSize = int(totalSize)
         bytesRead = 0
 
@@ -76,9 +86,10 @@ class Downloader:
         if not self.readChunkToFile(resp, filename, reportHook=showProcess):
             raise DownloadException('file is not fully retrieved!')
 
-        return filename
+        return os.path.abspath(filename)
 
 
 if __name__ == '__main__':
-    dn = Downloader('https://www.python.org/ftp/python/3.4.3/python-3.4.3-macosx10.6.pkg')
-    dn.download(True)
+    dn = Downloader('http://img2.ph.126.net/5Fko2oCImsGp2V9eoh-7JA==/6598141790494356305.jpg')
+    absp=dn.download(True)
+    print('downloaded file path:',absp)
