@@ -38,12 +38,16 @@ if not version:
 
 print('find latest version :', version)
 
-if compareVersion(version):
+#with -f package will be force installed
+if (len(sys.argv) == 2 and sys.argv[1] == '-f') or (not compareVersion(version)):
+    absp=pydownload.retrievePkg(pkgurl)
+    print('file downloaded at :', absp)
+
+    installPkg(absp)
+
+else:
     print('local version is the same as the latest, ignore this update')
 
-absp=pydownload.retrievePkg(pkgurl)
-print('file downloaded at :', absp)
 
-installPkg(absp)
 
 
