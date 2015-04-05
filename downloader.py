@@ -28,8 +28,8 @@ class Downloader:
         if interval == 0:
             interval = 0.000001
 
-        sys.stdout.write("Downloaded %d of %d bytes (%0.2f%%)  speed (%0.2f) kB/s\r" %
-                         (bytesRead, totalSize, percent, chunk / interval / 1000))
+        sys.stdout.write("Downloaded %d of %d bytes (%0.2f%%)  speed (%0.2f) kB/s                  \r" %
+                         (bytesRead, totalSize, percent, chunk / interval / 1024))
 
         if bytesRead >= totalSize:
             sys.stdout.write('\n')
@@ -71,7 +71,7 @@ class Downloader:
 
         return bytesRead == totalSize
 
-    def download(self, showProcess=False):
+    def download(self, checkperSize=102400, showProcess=False):
         if not self.path:
             raise DownloadException('download path not set!')
 
@@ -83,13 +83,16 @@ class Downloader:
 
         resp = urllib.request.urlopen(self.path)
 
-        if not self.readChunkToFile(resp, filename, reportHook=showProcess):
+        if not self.readChunkToFile(resp, filename, chunkSize=checkperSize,reportHook=showProcess):
             raise DownloadException('file is not fully retrieved!')
 
         return os.path.abspath(filename)
 
 
 if __name__ == '__main__':
-    dn = Downloader('http://img2.ph.126.net/5Fko2oCImsGp2V9eoh-7JA==/6598141790494356305.jpg')
-    absp=dn.download(True)
+    #dn = Downloader('http://img2.ph.126.net/5Fko2oCImsGp2V9eoh-7JA==/6598141790494356305.jpg')
+    #absp=dn.download(True)
+
+    dn = Downloader('http://www.valentina-db.com/de/studio/download/current/vstudio_mac_32?format=raw')
+    absp=dn.download(checkperSize=10240, showProcess=True)
     print('downloaded file path:',absp)
